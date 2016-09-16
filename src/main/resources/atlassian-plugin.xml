@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
+  <plugin-info>
+    <description>${project.description}</description>
+    <version>${project.version}</version>
+    <vendor name="${project.organization.name}" url="${project.organization.url}"/>
+    <param name="plugin-icon">images/pluginIcon.png</param>
+    <param name="plugin-logo">images/pluginLogo.png</param>
+  </plugin-info>
+  
+  <!-- add our i18n resource -->
+  <resource type="i18n" name="i18n" location="pullrequest-trigger"/>
+  
+  <ao key="pullrequest-trigger-ao-module" namespace="de.codecentric.bitbucket.plugin">
+        <entity>de.codecentric.bitbucket.plugin.dao.AoRepositoryPlan</entity>
+        <entity>de.codecentric.bitbucket.plugin.dao.AoPullRequestPlan</entity>
+    </ao>
+  <rest key="pullrequest-trigger-rest" path="/pullrequest-trigger" version="1.0">
+	<dispatcher>REQUEST</dispatcher>
+	<dispatcher>FORWARD</dispatcher>
+	<init-param>
+		<param-name>extension.filter.excludes</param-name>
+		<param-value>.*</param-value>
+	</init-param>
+	<package>de.codecentric.bitbucket.plugin.rest</package>
+  </rest>
+  
+  <!-- add our web resources -->
+  <client-resource key="pullrequest-trigger-page-resources" name="pullrequest-trigger Frontend Resources">    
+    <resource type="download" name="pullrequest-trigger.css" location="/css/pullrequest-trigger.css"/>
+    <resource type="download" name="pullrequest-trigger.js" location="/js/pullrequest-trigger.js"/>
+    <resource type="download" name="images/" location="/images"/>
+    <context>pullrequest-trigger.settings</context>
+    <dependency>com.atlassian.bitbucket.server.bitbucket-web:global</dependency>
+    <dependency>com.atlassian.auiplugin:aui-spinner</dependency>
+  </client-resource>
+  
+  <web-resource key="pullrequest-trigger-page-templates" name="pullrequest-trigger Page Templates">
+  	<transformation extension="soy">
+      <transformer key="soyTransformer" />
+      <transformer key="stashJsHelp" />
+      <transformer key="jsI18n" />
+    </transformation>
+    
+    <resource type="download" name="pullrequest.trigger.settings.soy.js" location="/static/pullrequest.trigger.settings.soy" />
+  </web-resource>
+
+  <web-item name="Pull Request Trigger Settings" i18n-name-key="pull-request-trigger-settings.name" key="pull-request-trigger-settings" section="bitbucket.repository.settings.panel/repository-workflow-section" weight="1000">
+    <description key="pull-request-trigger-settings.description">The Pull Request Trigger Settings Plugin</description>
+    <label key="pull-request-trigger-settings.label"/>
+    <link>${navBuilder.pluginServlets().path('pullrequest-trigger-settings', 'projects', $project.key, 'repos', $repository.slug).buildRelNoContext()}</link>
+  </web-item>
+  
+  <servlet name="Pull Request Trigger Settings Servlet" i18n-name-key="pull-request-trigger-settings.name" key="pull-request-trigger-settings-servlet" class="de.codecentric.bitbucket.plugin.servlet.PullRequestTriggerSettings">
+    <description key="pull-request-trigger-settings-servlet.description">The Pull Request Trigger Settings Plugin</description>
+    <url-pattern>/pullrequest-trigger-settings/*</url-pattern>
+  </servlet>
+</atlassian-plugin>
