@@ -17,14 +17,14 @@
     	<form class="aui" method="POST">
     		<div class="field-group">
     			<label for="bamboo-instances">Bamboo Instance<span class="aui-icon icon-required">(required)</span></label>
-    			<select class="select" id="bambooInstance" name="bambooInstance">
+    			<select class="select" id="bambooInstance" name="bambooInstance" data-aui-validation-field data-aui-validation-required="required">
     				<option value="">Select Bamboo Instance</option>
     			</select><div id="instance-spinner"></div>
     			<div class="description">The Bamboo instance to trigger the build on. Use the Application Links feature to define instances to run builds on.</div>
     		</div>
     		<div class="field-group">
     			<label for="plan">Plan<span class="aui-icon icon-required">(required)</span></label>
-    			<select class="select" id="plan" name="plan">
+    			<select class="select" id="plan" name="plan" data-aui-validation-field data-aui-validation-required="required">
     				<option value="">Select Plan to run</option>
     			</select><div id="plan-spinner"></div>
     			<div class="description">The Plan to run when a pull request is created or modified.</div>

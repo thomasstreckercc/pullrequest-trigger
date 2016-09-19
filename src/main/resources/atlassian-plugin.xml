@@ -34,6 +34,7 @@
     <context>pullrequest-trigger.settings</context>
     <dependency>com.atlassian.bitbucket.server.bitbucket-web:global</dependency>
     <dependency>com.atlassian.auiplugin:aui-spinner</dependency>
+    <dependency>com.atlassian.auiplugin:aui-form-validation</dependency>
   </client-resource>
   
   <web-resource key="pullrequest-trigger-page-templates" name="pullrequest-trigger Page Templates">
