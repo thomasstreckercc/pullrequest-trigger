@@ -73,13 +73,21 @@ define('pullrequest-trigger/module', [
 	}
 	
 	function onInstancesSuccess(data) {
-		_.forEach(data, addInstanceToSelection);
-		if (selectedInstanceId) {
-			$('#bambooInstance').val(selectedInstanceId);
-		}
-		$('#bambooInstance').prop('disabled', false);
-		if (selectedInstanceId) {
-			loadPlansForInstance(selectedInstanceId);
+		if (!(data && Array.isArray(data) && data.length > 0)) {
+			AJS.messages.error({
+				title: 'Unable to find any linked Bamboo instances',
+				body: '<p>Please <a href="' + nav.pluginServlets().path('applinks', 'listApplicationLinks').build() + '">add links to Bamboo instances</a> to your installation or have an administrator add them. </p>',
+				closeable: false
+			});
+		} else {
+			_.forEach(data, addInstanceToSelection);
+			if (selectedInstanceId) {
+				$('#bambooInstance').val(selectedInstanceId);
+			}
+			$('#bambooInstance').prop('disabled', false);
+			if (selectedInstanceId) {
+				loadPlansForInstance(selectedInstanceId);
+			}
 		}
 	}
 	
@@ -105,9 +113,14 @@ define('pullrequest-trigger/module', [
 		});
 	}
 	
+	function initBambooCancel() {
+		$('#cancel-button').attr('href', nav.currentRepo().browse());
+	}
+	
     exports.onReady = function(instanceId, planKey) {
 		selectedInstanceId = instanceId;
 		selectedPlanKey = planKey;
     	initBambooSelect();
+    	initBambooCancel();
     };
 });

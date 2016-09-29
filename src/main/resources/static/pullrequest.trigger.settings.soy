@@ -14,6 +14,7 @@
         <title>{{getText('pullrequest-trigger.settings.title')}}</title>
     </head>
     <body>
+    	<div id="aui-message-bar"></div>
     	<form class="aui" method="POST">
     		<div class="field-group">
     			<label for="bamboo-instances">Bamboo Instance<span class="aui-icon icon-required">(required)</span></label>
@@ -32,7 +33,7 @@
     		<div class="buttons-container">
    				<div class="buttons">
         			<input class="button submit" type="submit" value="Save" id="pullrequest-trigger-save-button">
-        			<a class="cancel" href="#">Cancel</a>
+        			<a class="cancel" id="cancel-button">Cancel</a>
     			</div>
 			</div>
 	    </form>
