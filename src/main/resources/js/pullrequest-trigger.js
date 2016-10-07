@@ -33,7 +33,6 @@ define('pullrequest-trigger/module', [
 	          .done(onPlansSuccess)
 	          .always(function() {
 	        	  AJS.$('#plan-spinner').spinStop();
-	        	  $('#plan').prop('disabled', false);
 	          });
 		}
 	}
@@ -73,7 +72,7 @@ define('pullrequest-trigger/module', [
 	}
 	
 	function onInstancesSuccess(data) {
-		if (!(data && Array.isArray(data) && data.length > 0)) {
+		if (!(data && Array.isArray(data) && data.length)) {
 			AJS.messages.error({
 				title: 'Unable to find any linked Bamboo instances',
 				body: '<p>Please <a href="' + nav.pluginServlets().path('applinks', 'listApplicationLinks').build() + '">add links to Bamboo instances</a> to your installation or have an administrator add them. </p>',
@@ -96,9 +95,18 @@ define('pullrequest-trigger/module', [
 	}
 	
 	function onPlansSuccess(data) {
-		_.forEach(data, addProjectToSelection);
-		if(selectedPlanKey) {
-		  $('#plan').val(selectedPlanKey);
+		if (!(data && Array.isArray(data) && data.length)) {
+			AJS.messages.error({
+				title: 'Unable to find any plans in the selected Bamboo instance',
+				body: '<p>Please define some build plans for this Bamboo instance which could be triggered for pull requests</p>',
+				closeable: false
+			});
+		} else {
+			_.forEach(data, addProjectToSelection);
+			$('#plan').prop('disabled', false);
+			if(selectedPlanKey) {
+				$('#plan').val(selectedPlanKey);
+			}
 		}
 	}
 	
