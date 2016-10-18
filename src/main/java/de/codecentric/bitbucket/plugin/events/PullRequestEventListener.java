@@ -56,6 +56,7 @@ public class PullRequestEventListener {
     @EventListener
     public void onPullRequestMerged(PullRequestMergedEvent event) {
         disablePlanBranch(event);
+        deletePlanBranch(event);
     }
 
     @EventListener
@@ -148,6 +149,18 @@ public class PullRequestEventListener {
                     false);
         } else {
             return false;
+        }
+    }
+    
+    private void deletePlanBranch(PullRequestEvent event) {
+        AoPullRequestPlan plan = findPullRequestPlan(event.getPullRequest());
+        if (plan != null) {
+            executeBambooRequest(
+                    plan.getBambooInstanceId(), 
+                    MethodType.POST, 
+                    "/chain/admin/deleteChain!doDelete.action?os_authType=basic&buildKey=" + plan.getPlanKey(), 
+                    response -> true, 
+                    null);
         }
     }
 
