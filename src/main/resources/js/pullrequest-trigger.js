@@ -23,10 +23,6 @@ define('pullrequest-trigger/module', [
 		$('#bambooInstance').on('change', handleNewBambooInstanceSelection);
 	}
 
-	function initBambooCancel() {
-		$('#cancel-button').attr('href', nav.currentRepo().browse());
-	}
-
 	function initPlanSelect() {
 		disableSaveButtonIfNecessary(!selectedPlanKey);
 		$('#plan').on('change', handleNewPlanSelection);
@@ -203,6 +199,5 @@ define('pullrequest-trigger/module', [
     initPlanSelect();
     initSave();
     initDelete();
-    initBambooCancel();
   };
 });
