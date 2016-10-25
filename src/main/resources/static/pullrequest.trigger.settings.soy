@@ -10,12 +10,12 @@
         <meta name="decorator" content="bitbucket.repository.settings">
         <meta name="projectKey" content="{$repository.project.key}">
         <meta name="repositorySlug" content="{$repository.slug}">
-        <meta name="activeTab" content="pull-request-trigger-settings-menu">
+        <meta name="activeTab" content="pull-request-trigger-settings">
         <title>{{getText('pullrequest-trigger.settings.title')}}</title>
     </head>
     <body>
     	<div id="aui-message-bar"></div>
-    	<form class="aui" method="POST">
+    	<form id="configuration" class="aui" method="POST">
     		<div class="field-group">
     			<label for="bamboo-instances">Bamboo Instance<span class="aui-icon icon-required">(required)</span></label>
     			<select class="select" id="bambooInstance" name="bambooInstance" data-aui-validation-field data-aui-validation-required="required">
@@ -32,13 +32,19 @@
     		</div>
     		<div class="buttons-container">
    				<div class="buttons">
-        			<input class="button submit" type="submit" value="Save" id="pullrequest-trigger-save-button">
+        			<a class="button submit" id="save-button">Save</a>
         			<a class="cancel" id="cancel-button">Cancel</a>
     			</div>
+				{if $plan}
+					<div class="buttons" style="margin-top:10px">
+						<a class="button submit" id="delete-button">Delete settings for this repository</a>
+						<div class="description">This will prevent all future pull request activities for this repository from triggering builds or removing plans upon merge on your Bamboo servers.</div>
+					</div>
+				{/if}
 			</div>
 	    </form>
 		<script>
-		  require('pullrequest-trigger/module').onReady({if $plan}'{$plan.bambooInstance}','{$plan.plan}'{/if});
+			require('pullrequest-trigger/module').onReady('{$repository.id}'{if $plan}, '{$plan.bambooInstance}', '{$plan.plan}'{/if});
 		</script>
     </body>
 </html>

@@ -11,6 +11,7 @@ public class RestRepositoryPlan extends RestMapEntity {
     private static final long serialVersionUID = 1703305539977790853L;
 
     public RestRepositoryPlan(AoRepositoryPlan plan) {
+        this.put("repositoryId", plan.getRepositoryId());
         this.put("bambooInstance", plan.getBambooInstanceId());
         this.put("plan", plan.getPlanKey());
     }

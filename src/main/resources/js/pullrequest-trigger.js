@@ -6,19 +6,69 @@ define('pullrequest-trigger/module', [
     'bitbucket/internal/util/ajax',
     'exports'
 ], function (
-	AJS,
+    AJS,
     $,
     _,
     nav,
     ajax,
     exports
 ) {
+	'use strict';
+	var selectedRepositoryId;
 	var selectedInstanceId;
 	var selectedPlanKey;
-	
+
+	function initBambooSelect() {
+		loadInstances();
+		$('#bambooInstance').on('change', handleNewBambooInstanceSelection);
+	}
+
+	function initBambooCancel() {
+		$('#cancel-button').attr('href', nav.currentRepo().browse());
+	}
+
+	function initPlanSelect() {
+		disableSaveButtonIfNecessary(!selectedPlanKey);
+		$('#plan').on('change', handleNewPlanSelection);
+	}
+
+	function initSave() {
+		$('#save-button').on('click', saveConfiguration);
+	}
+
+	function initDelete() {
+		$('#delete-button').on('click', deleteConfiguration);
+	}
+
+	function deleteConfiguration(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		ajax
+		 	.ajax({
+		 		url: getDeleteConfigurationUrl(selectedRepositoryId),
+		 		type: 'DELETE'})
+        	.always(function() {
+        		window.location.reload(true);
+        	});
+	}
+
+	function saveConfiguration(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		if (selectedInstanceId && selectedPlanKey) {
+  		ajax
+  		 	.ajax({
+  		 		url: getSaveConfigurationUrl(selectedRepositoryId, selectedInstanceId, selectedPlanKey),
+  		 		type: 'GET'})
+          	.always(function() {
+          		window.location.reload(true);
+          	});
+		}
+	}
+
 	function handleNewBambooInstanceSelection(event) {
-		var instanceId = event.target.value;
-		loadPlansForInstance(instanceId);
+		selectedInstanceId = event.target.value;
+		loadPlansForInstance(selectedInstanceId);
 	}
 	
 	function loadPlansForInstance(instanceId) {
@@ -34,6 +84,8 @@ define('pullrequest-trigger/module', [
 	          .always(function() {
 	        	  AJS.$('#plan-spinner').spinStop();
 	          });
+		} else {
+			disableSaveButtonIfNecessary(true);
 		}
 	}
 	
@@ -51,9 +103,28 @@ define('pullrequest-trigger/module', [
         });
 	}
 	
-	function initBambooSelect() {
-		loadInstances();
-		$('#bambooInstance').on('change', handleNewBambooInstanceSelection);
+	function disableSaveButtonIfNecessary(disabled) {
+		$('#save-button').attr('disabled', disabled);
+	}
+	
+	function handleNewPlanSelection(event) {
+		selectedPlanKey = event.target.value;
+		disableSaveButtonIfNecessary(!selectedPlanKey);
+	}
+	
+	function getDeleteConfigurationUrl(repositoryId) {
+		var urlBuilder = nav
+			.rest('pullrequest-trigger', '1.0')
+			.addPathComponents('configuration', repositoryId);
+		return urlBuilder.build();
+	}
+	
+	function getSaveConfigurationUrl(repositoryId, instanceId, planKey) {
+		var urlBuilder = nav
+			.rest('pullrequest-trigger', '1.0')
+			.addPathComponents('configuration', repositoryId)
+			.withParams({instanceId: instanceId, planKey: planKey});
+		return urlBuilder.build();
 	}
 	
 	function getPlansUrl(instanceId) {
@@ -75,7 +146,7 @@ define('pullrequest-trigger/module', [
 		if (!(data && Array.isArray(data) && data.length)) {
 			AJS.messages.error({
 				title: 'Unable to find any linked Bamboo instances',
-				body: '<p>Please <a href="' + nav.pluginServlets().path('applinks', 'listApplicationLinks').build() + '">add links to Bamboo instances</a> to your installation or have an administrator add them. </p>',
+				body: '<p>Please <a href="' + nav.pluginServlets().path('applinks', 'listApplicationLinks').build() + '">add links to Bamboo instances</a> to your installation or have an administrator add them.</p>',
 				closeable: false
 			});
 		} else {
@@ -103,10 +174,12 @@ define('pullrequest-trigger/module', [
 			});
 		} else {
 			_.forEach(data, addProjectToSelection);
-			$('#plan').prop('disabled', false);
+			var plan = $('#plan');
+			plan.prop('disabled', false);
 			if(selectedPlanKey) {
-				$('#plan').val(selectedPlanKey);
+				plan.val(selectedPlanKey);
 			}
+			disableSaveButtonIfNecessary(!plan.val());
 		}
 	}
 	
@@ -121,14 +194,15 @@ define('pullrequest-trigger/module', [
 		});
 	}
 	
-	function initBambooCancel() {
-		$('#cancel-button').attr('href', nav.currentRepo().browse());
-	}
-	
-    exports.onReady = function(instanceId, planKey) {
-		selectedInstanceId = instanceId;
+  exports.onReady = function(repositoryId, instanceId, planKey) {
+		selectedRepositoryId = repositoryId;
+    selectedInstanceId = instanceId;
 		selectedPlanKey = planKey;
-    	initBambooSelect();
-    	initBambooCancel();
-    };
+		
+    initBambooSelect();
+    initPlanSelect();
+    initSave();
+    initDelete();
+    initBambooCancel();
+  };
 });
